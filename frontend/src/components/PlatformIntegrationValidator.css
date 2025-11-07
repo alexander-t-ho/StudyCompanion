@@ -1,0 +1,181 @@
+.platform-validator {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.platform-validator h2 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.platform-validator > p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.validator-config {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+}
+
+.config-field {
+  margin-bottom: 1rem;
+}
+
+.config-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.config-field input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.test-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.test-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.test-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.test-results {
+  margin-bottom: 2rem;
+}
+
+.test-results h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.test-result {
+  background: #f8f9fa;
+  border-left: 4px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+.test-result.success {
+  border-left-color: #4caf50;
+}
+
+.test-result.error {
+  border-left-color: #f44336;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.result-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.result-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.result-status.success {
+  background: #4caf50;
+  color: white;
+}
+
+.result-status.error {
+  background: #f44336;
+  color: white;
+}
+
+.result-error {
+  color: #c33;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.result-data {
+  margin-top: 0.75rem;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.result-data pre {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.validation-checklist {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 6px;
+}
+
+.validation-checklist h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.validation-checklist ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.validation-checklist li {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: white;
+  border-radius: 4px;
+  border-left: 4px solid #ddd;
+  position: relative;
+  padding-left: 2.5rem;
+}
+
+.validation-checklist li.checked {
+  border-left-color: #4caf50;
+}
+
+.validation-checklist li.checked::before {
+  content: '✓';
+  position: absolute;
+  left: 0.75rem;
+  color: #4caf50;
+  font-weight: bold;
+}
+

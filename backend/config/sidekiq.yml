@@ -1,0 +1,7 @@
+:queues:
+  - default
+  - session_processing
+  - high_priority
+
+:concurrency: 5
+

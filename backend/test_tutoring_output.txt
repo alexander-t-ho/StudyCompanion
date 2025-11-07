@@ -1,0 +1,111 @@
+**Tutor:** Hi there! How are you feeling about our session today?
+
+**Student:** Hi! I’m feeling okay, but I get a little anxious about math sometimes, especially with word problems.
+
+**Tutor:** That’s totally understandable. Word problems can be tricky! But today, we’ll focus on quadratic equations, and I promise we’ll take it step by step. Are you familiar with how to solve quadratic equations using factoring and the quadratic formula?
+
+**Student:** I’ve seen both methods, but I’m not very confident with them. I think I mostly understand factoring, but the quadratic formula confuses me a bit.
+
+**Tutor:** No problem! Let’s start with factoring since you’re more comfortable with that. Can you recall the standard form of a quadratic equation?
+
+**Student:** Um, I think it’s \( ax^2 + bx + c = 0 \)?
+
+**Tutor:** Exactly! Great job! Now, when we factor a quadratic equation, we’re looking for two numbers that multiply to \( ac \) and add up to \( b \). Let’s try a problem together. How about we factor \( x^2 + 5x + 6 = 0 \)?
+
+**Student:** Okay, so we need two numbers that multiply to 6 and add to 5. That would be 2 and 3, right?
+
+**Tutor:** Yes, you got it! So how would you write that in factored form?
+
+**Student:** It would be \( (x + 2)(x + 3) = 0 \)?
+
+**Tutor:** Perfect! Now, what do you do next to solve for \( x \)?
+
+**Student:** I think I set each factor equal to zero, so \( x + 2 = 0 \) and \( x + 3 = 0 \)?
+
+**Tutor:** Exactly! And what do you get for \( x \)?
+
+**Student:** For \( x + 2 = 0 \), it’s \( x = -2 \), and for \( x + 3 = 0 \), it’s \( x = -3 \). So, the solutions are \( x = -2 \) and \( x = -3 \)?
+
+**Tutor:** Yes, great job! You seem to have a solid grasp of factoring. How do you feel about that?
+
+**Student:** I feel pretty good! But what if the equation is harder, like when it has larger numbers?
+
+**Tutor:** That's a good question! Let’s move on to the quadratic formula, which works for all quadratic equations. The formula is \( x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \). Do you want to give it a try with an example?
+
+**Student:** Sure! What’s the equation?
+
+**Tutor:** Let’s use \( 2x^2 + 4x - 6 = 0 \).
+
+**Student:** Alright. So here, \( a = 2 \), \( b = 4 \), and \( c = -6 \)?
+
+**Tutor:** Correct! Now, can you plug those values into the quadratic formula?
+
+**Student:** Okay... so it would be \( x = \frac{-4 \pm \sqrt{4^2 - 4(2)(-6)}}{2(2)} \)?
+
+**Tutor:** That’s right! Let’s simplify it step by step. What do you get for \( 4^2 - 4(2)(-6) \)?
+
+**Student:** Hmm, that’s \( 16 + 48 \), which is 64?
+
+**Tutor:** Excellent! Now, what is the square root of 64?
+
+**Student:** That would be 8.
+
+**Tutor:** Great! Now substitute that back into the formula. What do you have?
+
+**Student:** So, \( x = \frac{-4 \pm 8}{4} \)?
+
+**Tutor:** Yes! Now, can you calculate the two possible values for \( x \)?
+
+**Student:** Okay, for \( x = \frac{-4 + 8}{4} \), that’s \( \frac{4}{4} = 1 \). And for \( x = \frac{-4 - 8}{4} \), that’s \( \frac{-12}{4} = -3 \).
+
+**Tutor:** Awesome! So your solutions are \( x = 1 \) and \( x = -3 \). How do you feel about using the quadratic formula now?
+
+**Student:** I feel much better! It seemed complicated at first, but breaking it down makes it easier to understand.
+
+**Tutor:** Exactly! Just remember to take it step by step. Do you want to practice one more problem, or is there a specific area you’d like to focus on next?
+
+**Student:** I’d like to try one more problem, but could we do a word problem? Those always trip me up.
+
+**Tutor:** Definitely! Let’s say a projectile is launched into the air, and its height in meters is given by the equation \( h(t) = -4.9t^2 + 20t + 5 \), where \( t \) is time in seconds. We want to find out when the projectile hits the ground, so we set \( h(t) = 0 \). Can you set that up?
+
+**Student:** Okay, so I need to solve \( -4.9t^2 + 20t + 5 = 0 \)?
+
+**Tutor:** Exactly! Now, which method do you want to use to solve it?
+
+**Student:** I think I’ll try the quadratic formula since it has those larger numbers.
+
+**Tutor:** Sounds good! What are \( a \), \( b \), and \( c \) in this case?
+
+**Student:** \( a = -4.9 \), \( b = 20 \), and \( c = 5 \)?
+
+**Tutor:** Right! Now go ahead and plug those values into the quadratic formula.
+
+**Student:** Alright… so \( t = \frac{-20 \pm \sqrt{20^2 - 4(-4.9)(5)}}{2(-4.9)} \)?
+
+**Tutor:** Perfect! Now, calculate the discriminant \( 20^2 - 4(-4.9)(5) \).
+
+**Student:** That’s \( 400 + 98 \), which is \( 498 \).
+
+**Tutor:** Great! Now what’s the square root of 498?
+
+**Student:** Uh, that’s about 22.3, I think?
+
+**Tutor:** Very close! Now, substitute that back into the formula and simplify.
+
+**Student:** So, it’s \( t = \frac{-20 \pm 22.3}{-9.8} \)?
+
+**Tutor:** Yes! Now calculate the two possible values for \( t \).
+
+**Student:** Okay… for \( t = \frac{-20 + 22.3}{-9.8} \), that’s \( \frac{2.3}{-9.8} \), which is about -0.23. And then for the other one, \( t = \frac{-20 - 22.3}{-9.8} \) gives me about 4.3 seconds.
+
+**Tutor:** Excellent! So the projectile hits the ground after about 4.3 seconds. How do you feel about solving that word problem now?
+
+**Student:** I feel a lot better! I was worried at first, but working through it with you helped me understand it more. 
+
+**Tutor:** That’s fantastic to hear! Remember, practice makes perfect, especially with word problems. Do you have any other questions or topics you’d like to cover before we wrap up?
+
+**Student:** Not right now! I think I’ll practice more with quadratic equations and word problems. 
+
+**Tutor:** Sounds like a plan! Just remember to take your time with them. I’m really proud of your progress today. See you next time!
+
+**Student:** Thank you! See you!

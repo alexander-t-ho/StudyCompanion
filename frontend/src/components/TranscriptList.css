@@ -1,0 +1,145 @@
+.transcript-list {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.list-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.refresh-button {
+  padding: 0.5rem 1rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.refresh-button:hover {
+  opacity: 0.9;
+}
+
+.transcript-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.transcript-item {
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.transcript-item:hover {
+  border-color: #667eea;
+  background: #f8f9ff;
+}
+
+.transcript-item.selected {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.transcript-item.approved {
+  border-left: 4px solid #4caf50;
+}
+
+.item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.subject {
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.approved-badge {
+  background: #4caf50;
+  color: white;
+}
+
+.rating-badge {
+  background: #ffc107;
+  color: #333;
+}
+
+.analysis-badge {
+  background: #2196f3;
+  color: white;
+}
+
+.item-details {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.topic {
+  font-weight: 500;
+}
+
+.level {
+  text-transform: capitalize;
+}
+
+.item-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.model {
+  font-family: monospace;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+

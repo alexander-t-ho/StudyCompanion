@@ -1,0 +1,289 @@
+.analysis-viewer {
+  margin-top: 2rem;
+  border-top: 2px solid #e0e0e0;
+  padding-top: 1.5rem;
+}
+
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.analysis-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.status-badge.validated {
+  background: #4caf50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.summary-section {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.summary-section h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.summary-section p {
+  margin: 0;
+  line-height: 1.6;
+  color: #555;
+}
+
+.sentiment-section,
+.concepts-section,
+.engagement-section {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.sentiment-section h4,
+.concepts-section h4,
+.engagement-section h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.sentiment-details {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.sentiment-item {
+  color: #555;
+}
+
+.sentiment-positive {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.sentiment-neutral {
+  color: #666;
+  font-weight: 600;
+}
+
+.sentiment-frustrated,
+.sentiment-confused {
+  color: #f44336;
+  font-weight: 600;
+}
+
+.sentiment-engaged {
+  color: #2196f3;
+  font-weight: 600;
+}
+
+.confidence-indicators {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #ddd;
+}
+
+.confidence-indicators ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+}
+
+.confidence-indicators li {
+  margin-bottom: 0.25rem;
+  color: #555;
+}
+
+.concepts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.concept-item {
+  background: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border-left: 3px solid #667eea;
+}
+
+.concept-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.concept-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.mastery-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.mastery-struggling {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.mastery-learning {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.mastery-mastered {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.concept-evidence {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.topics-covered {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #ddd;
+  color: #555;
+}
+
+.engagement-score {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.engagement-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.metric-item {
+  color: #555;
+}
+
+.analysis-meta {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.75rem;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.meta-item {
+  color: #666;
+}
+
+.analysis-validation {
+  border-top: 2px solid #e0e0e0;
+  padding-top: 1.5rem;
+}
+
+.analysis-validation h4 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.validation-field {
+  margin-bottom: 1.5rem;
+}
+
+.validation-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.rating-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rating-button {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.rating-button:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.rating-button.selected {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.validation-field textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.validation-field input[type="checkbox"] {
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.save-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.save-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
