@@ -1,45 +1,63 @@
 #!/bin/bash
-# Script to start both frontend and backend servers
+# Start StudyCompanion servers
 
-echo "🚀 Starting Study Companion Servers..."
+echo "🚀 Starting StudyCompanion Servers..."
 echo ""
 
-# Start Backend (Rails API) on port 3004
-echo "Starting backend on port 3004..."
-cd "$(dirname "$0")/backend"
-eval "$(rbenv init - zsh)"
-bundle exec rails server -p 3004 > /tmp/rails_3004.log 2>&1 &
+# Kill any existing processes
+echo "Cleaning up existing processes..."
+kill -9 $(lsof -ti:3002) 2>/dev/null || true
+kill -9 $(lsof -ti:3000) 2>/dev/null || true
+rm -f /Users/alexho/StudyCompanion/backend/tmp/pids/server.pid 2>/dev/null || true
+
+# Start Backend
+echo "📦 Starting backend on port 3002..."
+cd /Users/alexho/StudyCompanion/backend
+eval "$(rbenv init -)"
+PORT=3002 bundle exec rails server > /tmp/studycompanion_backend.log 2>&1 &
 BACKEND_PID=$!
-echo "Backend started (PID: $BACKEND_PID)"
-echo ""
+echo "   Backend PID: $BACKEND_PID"
 
-# Wait a moment for backend to start
-sleep 3
-
-# Start Frontend (Vite/React) on port 3002
-echo "Starting frontend on port 3002..."
-cd "$(dirname "$0")/frontend"
-if [ -s "$HOME/.nvm/nvm.sh" ]; then
-  source "$HOME/.nvm/nvm.sh"
-  nvm use default >/dev/null 2>&1
-fi
-npm run dev > /tmp/frontend_3002.log 2>&1 &
-FRONTEND_PID=$!
-echo "Frontend started (PID: $FRONTEND_PID)"
-echo ""
-
-# Wait for servers to start
+# Wait for backend to start
 sleep 5
 
-echo "✅ Servers starting..."
+# Check if backend started
+if lsof -ti:3002 > /dev/null 2>&1; then
+    echo "✅ Backend is running on port 3002"
+else
+    echo "❌ Backend failed to start. Check logs: tail -f /tmp/studycompanion_backend.log"
+    exit 1
+fi
+
+# Start Frontend
+echo "📦 Starting frontend on port 3000..."
+cd /Users/alexho/StudyCompanion/frontend
+npm run dev > /tmp/studycompanion_frontend.log 2>&1 &
+FRONTEND_PID=$!
+echo "   Frontend PID: $FRONTEND_PID"
+
+# Wait for frontend to start
+sleep 5
+
+# Check if frontend started
+if lsof -ti:3000 > /dev/null 2>&1; then
+    echo "✅ Frontend is running on port 3000"
+else
+    echo "⚠️  Frontend may have issues. Check logs: tail -f /tmp/studycompanion_frontend.log"
+    echo "   Note: If you see Node.js library errors, you may need to fix your Node.js installation"
+fi
+
 echo ""
-echo "🌐 Frontend: http://localhost:3002"
-echo "🔧 Backend:  http://localhost:3004"
+echo "✅ Servers started!"
 echo ""
-echo "Logs:"
-echo "  Backend:  tail -f /tmp/rails_3004.log"
-echo "  Frontend: tail -f /tmp/frontend_3002.log"
+echo "📍 Access the app at: http://localhost:3000"
+echo "📍 Backend API at: http://localhost:3002"
+echo ""
+echo "To view logs:"
+echo "  Backend:  tail -f /tmp/studycompanion_backend.log"
+echo "  Frontend: tail -f /tmp/studycompanion_frontend.log"
 echo ""
 echo "To stop servers:"
-echo "  kill $BACKEND_PID $FRONTEND_PID"
-
+echo "  kill $BACKEND_PID  # Backend"
+echo "  kill $FRONTEND_PID  # Frontend"
+echo "  Or: kill \$(lsof -ti:3002) && kill \$(lsof -ti:3000)"

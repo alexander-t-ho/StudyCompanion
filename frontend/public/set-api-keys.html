@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set API Keys</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .key-status {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Set API Keys</h1>
+        <div id="status"></div>
+        <button onclick="setApiKeys()">Set API Keys</button>
+        <div id="keyStatus" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        function setApiKeys() {
+            // Prompt user for API keys
+            const openaiKey = prompt('Enter your OpenAI API key:');
+            if (openaiKey) {
+                localStorage.setItem('openai_api_key', openaiKey);
+            }
+            
+            const openrouterKey = prompt('Enter your OpenRouter API key (optional, press Cancel to skip):');
+            if (openrouterKey) {
+                localStorage.setItem('openrouter_api_key', openrouterKey);
+            }
+            
+            // Set to use OpenAI by default (change to 'true' to use OpenRouter)
+            localStorage.setItem('use_openrouter', 'false');
+            
+            // Show success message
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '<div class="status success">✓ API keys set successfully! You can now close this page and return to the application.</div>';
+            
+            // Show current status
+            updateKeyStatus();
+        }
+        
+        function updateKeyStatus() {
+            const keyStatusDiv = document.getElementById('keyStatus');
+            const openaiKey = localStorage.getItem('openai_api_key');
+            const openrouterKey = localStorage.getItem('openrouter_api_key');
+            const useOpenRouter = localStorage.getItem('use_openrouter');
+            
+            let html = '<h3>Current Status:</h3>';
+            html += `<div class="key-status">OpenAI API Key: ${openaiKey ? '✓ Set' : '✗ Not set'}</div>`;
+            html += `<div class="key-status">OpenRouter API Key: ${openrouterKey ? '✓ Set' : '✗ Not set'}</div>`;
+            html += `<div class="key-status">Using OpenRouter: ${useOpenRouter === 'true' ? 'Yes' : 'No (Using OpenAI)'}</div>`;
+            
+            keyStatusDiv.innerHTML = html;
+        }
+        
+        // Check status on load
+        window.onload = function() {
+            updateKeyStatus();
+            const openaiKey = localStorage.getItem('openai_api_key');
+            if (openaiKey) {
+                document.getElementById('status').innerHTML = '<div class="status info">API keys are already set. Click the button to update them.</div>';
+            }
+        };
+    </script>
+</body>
+</html>
+

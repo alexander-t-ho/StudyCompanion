@@ -282,6 +282,38 @@ function TranscriptViewer({ transcript, onUpdate }) {
       </div>
 
       <div className="transcript-info">
+        {transcript?.student_id && (
+          <div className="info-row">
+            <span className="info-label">Student ID:</span>
+            <span className="info-value">{transcript.student_id}</span>
+          </div>
+        )}
+        {transcript?.session_date && (
+          <div className="info-row">
+            <span className="info-label">Session Date:</span>
+            <span className="info-value">{new Date(transcript.session_date).toLocaleDateString()}</span>
+          </div>
+        )}
+        {transcript?.session_count_this_week != null && (
+          <div className="info-row">
+            <span className="info-label">Sessions This Week:</span>
+            <span className="info-value">{transcript.session_count_this_week}</span>
+          </div>
+        )}
+        {transcript?.understanding_level != null && (
+          <div className="info-row">
+            <span className="info-label">Understanding Level:</span>
+            <span className="info-value">
+              {Number(transcript.understanding_level).toFixed(1)}%
+              {transcript?.previous_understanding_level != null && Number(transcript.previous_understanding_level || 0) > 0 && (
+                <span style={{ marginLeft: '0.5rem', fontSize: '0.9em', color: Number(transcript.understanding_level || 0) > Number(transcript.previous_understanding_level || 0) ? '#4caf50' : '#666' }}>
+                  ({Number(transcript.understanding_level || 0) > Number(transcript.previous_understanding_level || 0) ? '+' : ''}
+                  {(Number(transcript.understanding_level || 0) - Number(transcript.previous_understanding_level || 0)).toFixed(1)}% from previous)
+                </span>
+              )}
+            </span>
+          </div>
+        )}
         <div className="info-row">
           <span className="info-label">Subject:</span>
           <span className="info-value">{transcript?.subject || 'N/A'}</span>
@@ -313,6 +345,62 @@ function TranscriptViewer({ transcript, onUpdate }) {
           </div>
         )}
       </div>
+
+      {/* Session History Summary */}
+      {transcript?.session_history_summary && typeof transcript.session_history_summary === 'object' && (
+        <div className="transcript-info" style={{ marginTop: '1rem' }}>
+          <h4 style={{ marginBottom: '0.75rem', color: '#667eea' }}>Session History</h4>
+          {transcript.session_history_summary.total_sessions_this_subject > 0 && (
+            <div className="info-row">
+              <span className="info-label">Total Sessions:</span>
+              <span className="info-value">{transcript.session_history_summary.total_sessions_this_subject}</span>
+            </div>
+          )}
+          {transcript.session_history_summary.days_since_last_session != null && (
+            <div className="info-row">
+              <span className="info-label">Days Since Last Session:</span>
+              <span className="info-value">{transcript.session_history_summary.days_since_last_session}</span>
+            </div>
+          )}
+          {transcript.session_history_summary.topics_covered_count > 0 && (
+            <div className="info-row">
+              <span className="info-label">Topics Covered:</span>
+              <span className="info-value">{transcript.session_history_summary.topics_covered_count} topics</span>
+            </div>
+          )}
+          {transcript.session_history_summary.concepts_mastered_count > 0 && (
+            <div className="info-row">
+              <span className="info-label">Concepts Mastered:</span>
+              <span className="info-value">{transcript.session_history_summary.concepts_mastered_count}</span>
+            </div>
+          )}
+          {transcript.session_history_summary.concepts_struggling_count > 0 && (
+            <div className="info-row">
+              <span className="info-label">Areas Struggling:</span>
+              <span className="info-value">{transcript.session_history_summary.concepts_struggling_count}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Goals Snapshot */}
+      {transcript?.goals_snapshot && typeof transcript.goals_snapshot === 'object' && transcript.goals_snapshot.active_goals?.length > 0 && (
+        <div className="transcript-info" style={{ marginTop: '1rem' }}>
+          <h4 style={{ marginBottom: '0.75rem', color: '#667eea' }}>Active Goals</h4>
+          {transcript.goals_snapshot.active_goals.map((goal, idx) => (
+            <div key={idx} className="info-row">
+              <span className="info-label">{goal.title || goal.goal_type || 'Goal'}:</span>
+              <span className="info-value">{goal.progress || 0}% complete</span>
+            </div>
+          ))}
+          {transcript.goals_snapshot.completed_goals_count > 0 && (
+            <div className="info-row">
+              <span className="info-label">Completed Goals:</span>
+              <span className="info-value">{transcript.goals_snapshot.completed_goals_count}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="transcript-content">
         <div className="content-header">

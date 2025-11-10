@@ -16,7 +16,5 @@ test:
 
 production:
   <<: *default
-  database: study_companion_production
-  username: <%= ENV["DATABASE_USER"] %>
-  password: <%= ENV["DATABASE_PASSWORD"] %>
+  url: <%= ENV['DATABASE_URL'] %>
 

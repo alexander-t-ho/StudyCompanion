@@ -1,0 +1,157 @@
+.goal-suggestions {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.source-goal-info {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.source-goal-info h3 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.source-goal-subject {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.suggestion-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.2s;
+}
+
+.suggestion-card:hover {
+  border-color: #2563eb;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-card.accepted {
+  background: #f0fdf4;
+  border-color: #10b981;
+  opacity: 0.9;
+}
+
+.suggestion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.suggestion-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 20px;
+  flex: 1;
+}
+
+.confidence-badge {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.goal-type-badge {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #4b5563;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-bottom: 15px;
+  text-transform: capitalize;
+}
+
+.suggestion-reasoning {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.suggestion-actions {
+  margin-top: 15px;
+}
+
+.accept-button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.accept-button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.accept-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.accepted-message {
+  color: #059669;
+  font-weight: 600;
+  padding: 12px;
+  background: #d1fae5;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.goal-id {
+  font-size: 12px;
+  color: #047857;
+}
+
+.suggestion-meta {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #999;
+  text-align: right;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-style: italic;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.error {
+  color: #dc2626;
+}
+
+
+
+
+

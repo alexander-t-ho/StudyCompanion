@@ -66,10 +66,24 @@ function TranscriptList({ onSelect, selectedId }) {
                 {transcript.quality_rating && (
                   <span className="badge rating-badge">⭐ {transcript.quality_rating}/5</span>
                 )}
+                {transcript.understanding_level != null && (
+                  <span className="badge" style={{ 
+                    backgroundColor: transcript.understanding_level >= 70 ? '#4caf50' : 
+                                     transcript.understanding_level >= 40 ? '#ff9800' : '#f44336',
+                    color: 'white'
+                  }}>
+                    {Number(transcript.understanding_level).toFixed(0)}% Understanding
+                  </span>
+                )}
               </div>
               <div className="item-details">
                 <span className="topic">{transcript.topic}</span>
                 <span className="level">{transcript.student_level}</span>
+                {transcript.student_id && (
+                  <span className="level" style={{ fontSize: '0.85em', color: '#666' }}>
+                    Student #{transcript.student_id}
+                  </span>
+                )}
               </div>
               <div className="item-meta">
                 <span className="date">{formatDate(transcript.created_at)}</span>

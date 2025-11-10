@@ -1,36 +1,143 @@
 .app {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
+.app.no-scroll {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app.allow-scroll {
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: none; /* Hide the header since tabs are now at top */
 }
 
-.app-header h1 {
-  margin-bottom: 0.5rem;
-  font-size: 2rem;
+.tabs-container {
+  background: white;
+  border-bottom: 2px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 1000;
+  order: -1; /* Move tabs to top */
 }
 
-.app-header p {
-  opacity: 0.9;
-  font-size: 1rem;
+.app.allow-scroll .tabs-container {
+  position: sticky;
+  top: 0;
+}
+
+.welcome-user-container {
+  background: transparent;
+  padding: 0;
+  position: relative;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.welcome-user-wrapper {
+  max-width: 1800px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 20px;
+  pointer-events: all;
+}
+
+.welcome-user-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+.welcome-user-button:hover {
+  background: linear-gradient(135deg, #ffffff 0%, #667eea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dropdown-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.2s;
+  background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-user-button:hover .dropdown-arrow {
+  background: linear-gradient(135deg, #ffffff 0%, #667eea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.user-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 12px;
+  background: rgba(20, 20, 30, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  min-width: 180px;
+  z-index: 1001;
+  overflow: hidden;
+}
+
+.user-menu-item {
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.user-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.user-menu-item:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tabs {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  border-bottom: 2px solid #e0e0e0;
+  gap: 0;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .tabs button {
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 1.5rem;
   background: transparent;
   border: none;
   border-bottom: 3px solid transparent;
@@ -39,6 +146,7 @@
   font-weight: 500;
   color: #666;
   transition: all 0.2s;
+  position: relative;
 }
 
 .tabs button:hover {
@@ -49,6 +157,7 @@
 .tabs button.active {
   color: #667eea;
   border-bottom-color: #667eea;
+  background: #f8f9fa;
 }
 
 .app-content {
@@ -59,6 +168,14 @@
   max-width: 1800px;
   margin: 0 auto;
   width: 100%;
+}
+
+.app.no-scroll .app-content {
+  overflow: hidden;
+}
+
+.app.allow-scroll .app-content {
+  overflow: visible;
 }
 
 .left-panel {
@@ -87,10 +204,60 @@
   .app-content {
     flex-direction: column;
   }
-  
+
   .left-panel,
   .right-panel {
-    min-width: 100%;
+    min-width: unset;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 1.5rem 1rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .app-header p {
+    font-size: 0.875rem;
+  }
+
+  .tabs {
+    padding: 0 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabs button {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  .app-content {
+    padding: 0.5rem;
+  }
+
+  .left-panel,
+  .right-panel {
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 1rem 0.75rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .tabs button {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
   }
 }
 

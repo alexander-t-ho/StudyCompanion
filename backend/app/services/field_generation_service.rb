@@ -18,6 +18,16 @@ class FieldGenerationService
     end
   end
 
+  def generate_topic(subject:, student_level: 'intermediate')
+    prompt = build_topic_prompt(subject, student_level)
+    
+    if @use_openrouter && @openrouter_api_key
+      generate_topic_via_openrouter(prompt)
+    else
+      generate_topic_via_openai(prompt)
+    end
+  end
+
   private
 
   def build_prompt(subject, topic, student_level)
@@ -136,6 +146,119 @@ class FieldGenerationService
     else
       raise "OpenRouter API error: #{response.body}"
     end
+  end
+
+  def build_topic_prompt(subject, student_level)
+    subject_guidance = get_subject_guidance(subject)
+    
+    <<~PROMPT
+      Generate a realistic and contextually appropriate topic for a tutoring session.
+
+      Subject: #{subject}
+      Student Level: #{student_level}
+
+      Subject Context:
+      #{subject_guidance}
+
+      Generate a specific topic that:
+      1. Is directly related to the subject
+      2. Is appropriate for a #{student_level} level student
+      3. Is specific enough to be useful (not too broad)
+      4. Is realistic and commonly covered in tutoring sessions
+
+      Respond ONLY with valid JSON in this exact format:
+      {
+        "topic": "Specific topic name (e.g., 'Derivatives and Chain Rule', 'Photosynthesis and Cellular Respiration', 'Essay Structure and Thesis Statements')"
+      }
+    PROMPT
+  end
+
+  def generate_topic_via_openai(prompt)
+    client = OpenAI::Client.new(access_token: @api_key)
+    model = 'gpt-4o-mini'
+
+    response = client.chat(
+      parameters: {
+        model: model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert at generating realistic educational topics. Always respond with valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 200,
+        response_format: { type: 'json_object' }
+      }
+    )
+
+    content = response.dig('choices', 0, 'message', 'content')
+    parse_topic_response(content)
+  end
+
+  def generate_topic_via_openrouter(prompt)
+    model = 'openai/gpt-4o-mini'
+    
+    response = HTTParty.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      headers: {
+        'Authorization' => "Bearer #{@openrouter_api_key}",
+        'Content-Type' => 'application/json',
+        'HTTP-Referer' => ENV['APP_URL'] || 'http://localhost:3000',
+        'X-Title' => 'Study Companion'
+      },
+      body: {
+        model: model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert at generating realistic educational topics. Always respond with valid JSON only.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 200,
+        response_format: { type: 'json_object' }
+      }.to_json
+    )
+
+    if response.success?
+      content = response.dig('choices', 0, 'message', 'content')
+      parse_topic_response(content)
+    else
+      raise "OpenRouter API error: #{response.body}"
+    end
+  end
+
+  def parse_topic_response(content)
+    parsed = JSON.parse(content)
+    {
+      topic: parsed['topic'] || get_fallback_topic
+    }
+  rescue JSON::ParserError => e
+    # Fallback if JSON parsing fails
+    {
+      topic: get_fallback_topic
+    }
+  end
+
+  def get_fallback_topic
+    # Simple fallback topics by subject
+    topics = [
+      'Introduction to Key Concepts',
+      'Problem-Solving Strategies',
+      'Review and Practice',
+      'Advanced Topics',
+      'Exam Preparation'
+    ]
+    topics.sample
   end
 
   def parse_response(content)

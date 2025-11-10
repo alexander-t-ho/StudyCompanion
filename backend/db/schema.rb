@@ -10,9 +10,53 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_01_000013) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_10_051518) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "ab_test_variations", force: :cascade do |t|
+    t.bigint "student_id", null: false
+    t.string "test_name", null: false
+    t.string "variation_name", null: false
+    t.boolean "is_active", default: true
+    t.datetime "assigned_at", null: false
+    t.datetime "ended_at"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["student_id", "test_name", "is_active"], name: "idx_on_student_id_test_name_is_active_79568ef86a"
+    t.index ["student_id"], name: "index_ab_test_variations_on_student_id"
+    t.index ["test_name", "variation_name"], name: "index_ab_test_variations_on_test_name_and_variation_name"
+    t.index ["test_name"], name: "index_ab_test_variations_on_test_name"
+  end
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "ai_companion_profiles", force: :cascade do |t|
     t.bigint "student_id", null: false
@@ -25,6 +69,62 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_000013) do
     t.datetime "updated_at", null: false
     t.index ["last_interaction_at"], name: "index_ai_companion_profiles_on_last_interaction_at"
     t.index ["student_id"], name: "index_ai_companion_profiles_on_student_id", unique: true
+  end
+
+  create_table "ai_cost_tracking", force: :cascade do |t|
+    t.bigint "student_id"
+    t.string "cost_type", null: false
+    t.string "model_used"
+    t.integer "token_count", default: 0
+    t.decimal "cost", precision: 10, scale: 6, null: false
+    t.string "provider"
+    t.jsonb "metadata", default: {}
+    t.date "cost_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cost_date"], name: "index_ai_cost_tracking_on_cost_date"
+    t.index ["cost_type", "cost_date"], name: "index_ai_cost_tracking_on_cost_type_and_cost_date"
+    t.index ["cost_type"], name: "index_ai_cost_tracking_on_cost_type"
+    t.index ["student_id", "cost_date"], name: "index_ai_cost_tracking_on_student_id_and_cost_date"
+    t.index ["student_id"], name: "index_ai_cost_tracking_on_student_id"
+  end
+
+  create_table "analytics_events", force: :cascade do |t|
+    t.bigint "student_id"
+    t.string "event_type", null: false
+    t.string "event_category", null: false
+    t.jsonb "properties", default: {}
+    t.string "session_id"
+    t.string "user_agent"
+    t.string "ip_address"
+    t.datetime "occurred_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_category"], name: "index_analytics_events_on_event_category"
+    t.index ["event_type", "occurred_at"], name: "index_analytics_events_on_event_type_and_occurred_at"
+    t.index ["event_type"], name: "index_analytics_events_on_event_type"
+    t.index ["occurred_at"], name: "index_analytics_events_on_occurred_at"
+    t.index ["student_id", "event_type", "occurred_at"], name: "idx_on_student_id_event_type_occurred_at_2353876bbb"
+    t.index ["student_id"], name: "index_analytics_events_on_student_id"
+  end
+
+  create_table "analytics_metrics", force: :cascade do |t|
+    t.bigint "student_id"
+    t.string "metric_name", null: false
+    t.string "metric_category", null: false
+    t.decimal "metric_value", precision: 15, scale: 4, null: false
+    t.string "metric_unit"
+    t.date "metric_date", null: false
+    t.jsonb "dimensions", default: {}
+    t.string "aggregation_period", default: "daily"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["metric_category"], name: "index_analytics_metrics_on_metric_category"
+    t.index ["metric_date"], name: "index_analytics_metrics_on_metric_date"
+    t.index ["metric_name", "metric_date", "aggregation_period"], name: "idx_on_metric_name_metric_date_aggregation_period_dd066f9b30"
+    t.index ["metric_name"], name: "index_analytics_metrics_on_metric_name"
+    t.index ["student_id", "metric_name", "metric_date"], name: "idx_on_student_id_metric_name_metric_date_a13e0a2df3"
+    t.index ["student_id"], name: "index_analytics_metrics_on_student_id"
   end
 
   create_table "conversation_messages", force: :cascade do |t|
@@ -56,9 +156,25 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_000013) do
     t.bigint "session_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "variant"
     t.index ["session_booked"], name: "index_early_engagement_nudges_on_session_booked"
     t.index ["session_id"], name: "index_early_engagement_nudges_on_session_id"
     t.index ["student_id", "sent_at"], name: "index_early_engagement_nudges_on_student_id_and_sent_at"
+    t.index ["variant"], name: "index_early_engagement_nudges_on_variant"
+  end
+
+  create_table "goal_progress_snapshots", force: :cascade do |t|
+    t.bigint "student_id", null: false
+    t.bigint "goal_id", null: false
+    t.decimal "completion_percentage", precision: 5, scale: 2
+    t.integer "milestones_completed", default: 0
+    t.date "estimated_completion_date"
+    t.date "snapshot_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["goal_id", "snapshot_date"], name: "index_goal_progress_snapshots_on_goal_id_and_snapshot_date"
+    t.index ["snapshot_date"], name: "index_goal_progress_snapshots_on_snapshot_date"
+    t.index ["student_id", "snapshot_date"], name: "index_goal_progress_snapshots_on_student_id_and_snapshot_date"
   end
 
   create_table "goal_suggestions", force: :cascade do |t|
@@ -91,8 +207,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_000013) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "parent_goal_id"
+    t.index ["parent_goal_id"], name: "index_goals_on_parent_goal_id"
     t.index ["status"], name: "index_goals_on_status"
     t.index ["student_id", "status"], name: "index_goals_on_student_id_and_status"
+    t.index ["student_id", "subject", "status"], name: "index_goals_on_student_id_subject_status"
+    t.index ["student_id", "subject"], name: "index_goals_on_student_id_and_subject"
     t.index ["student_id"], name: "index_goals_on_student_id"
   end
 
@@ -133,11 +253,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_000013) do
     t.datetime "processed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "understanding_level", precision: 5, scale: 2
+    t.decimal "previous_understanding_level", precision: 5, scale: 2
     t.index ["processing_status"], name: "index_session_summaries_on_processing_status"
     t.index ["session_id"], name: "index_session_summaries_on_session_id", unique: true
+    t.index ["student_id", "understanding_level"], name: "index_session_summaries_on_student_id_and_understanding_level"
     t.index ["student_id"], name: "index_session_summaries_on_student_id"
     t.index ["transcript_analysis_id"], name: "index_session_summaries_on_transcript_analysis_id"
     t.index ["transcript_id"], name: "index_session_summaries_on_transcript_id"
+    t.index ["understanding_level"], name: "index_session_summaries_on_understanding_level"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -168,9 +292,39 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_000013) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "password_digest"
+    t.string "username"
+    t.boolean "is_admin", default: false, null: false
     t.index ["ai_companion_enabled"], name: "index_students_on_ai_companion_enabled"
     t.index ["authentication_token"], name: "index_students_on_authentication_token"
     t.index ["email"], name: "index_students_on_email", unique: true
+    t.index ["username"], name: "index_students_on_username", unique: true
+  end
+
+  create_table "study_notes", force: :cascade do |t|
+    t.bigint "student_id", null: false
+    t.string "subject"
+    t.string "concept"
+    t.text "message"
+    t.datetime "detected_at"
+    t.boolean "notified_tutor", default: false, null: false
+    t.bigint "conversation_message_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_message_id"], name: "index_study_notes_on_conversation_message_id"
+    t.index ["student_id"], name: "index_study_notes_on_student_id"
+  end
+
+  create_table "subject_relationships", force: :cascade do |t|
+    t.string "source_subject", null: false
+    t.string "target_subject", null: false
+    t.string "relationship_type"
+    t.decimal "strength", precision: 3, scale: 2, default: "1.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_subject", "target_subject"], name: "idx_on_source_subject_target_subject_45ec5165e6", unique: true
+    t.index ["source_subject"], name: "index_subject_relationships_on_source_subject"
+    t.index ["target_subject"], name: "index_subject_relationships_on_target_subject"
   end
 
   create_table "transcript_analyses", force: :cascade do |t|
@@ -212,11 +366,23 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_000013) do
     t.decimal "generation_cost", precision: 10, scale: 4
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "session_date"
+    t.integer "session_count_this_week"
+    t.decimal "understanding_level", precision: 5, scale: 2
+    t.decimal "previous_understanding_level", precision: 5, scale: 2
+    t.jsonb "goals_snapshot", default: {}
+    t.jsonb "session_history_summary", default: {}
     t.index ["approved"], name: "index_transcripts_on_approved"
     t.index ["created_at"], name: "index_transcripts_on_created_at"
+    t.index ["session_date"], name: "index_transcripts_on_session_date"
     t.index ["session_id"], name: "index_transcripts_on_session_id"
+    t.index ["student_id", "subject", "session_date"], name: "index_transcripts_on_student_id_subject_session_date"
+    t.index ["student_id", "subject", "understanding_level"], name: "idx_on_student_id_subject_understanding_level_492db45d5c"
+    t.index ["student_id", "subject", "understanding_level"], name: "index_transcripts_on_student_id_subject_understanding_level", where: "(understanding_level IS NOT NULL)"
+    t.index ["student_id", "subject"], name: "index_transcripts_on_student_id_and_subject"
     t.index ["student_id"], name: "index_transcripts_on_student_id"
     t.index ["subject"], name: "index_transcripts_on_subject"
+    t.index ["understanding_level"], name: "index_transcripts_on_understanding_level"
   end
 
   create_table "tutor_routing_events", force: :cascade do |t|
@@ -236,16 +402,25 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_000013) do
     t.index ["student_id", "created_at"], name: "index_tutor_routing_events_on_student_id_and_created_at"
   end
 
+  add_foreign_key "ab_test_variations", "students"
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ai_companion_profiles", "students"
+  add_foreign_key "ai_cost_tracking", "students"
+  add_foreign_key "analytics_events", "students"
+  add_foreign_key "analytics_metrics", "students"
   add_foreign_key "conversation_messages", "ai_companion_profiles"
   add_foreign_key "conversation_messages", "session_summaries"
   add_foreign_key "conversation_messages", "sessions"
   add_foreign_key "conversation_messages", "students"
   add_foreign_key "early_engagement_nudges", "sessions"
   add_foreign_key "early_engagement_nudges", "students"
+  add_foreign_key "goal_progress_snapshots", "goals"
+  add_foreign_key "goal_progress_snapshots", "students"
   add_foreign_key "goal_suggestions", "goals", column: "created_goal_id"
   add_foreign_key "goal_suggestions", "goals", column: "source_goal_id"
   add_foreign_key "goal_suggestions", "students"
+  add_foreign_key "goals", "goals", column: "parent_goal_id"
   add_foreign_key "goals", "students"
   add_foreign_key "practice_problems", "goals"
   add_foreign_key "practice_problems", "students"
@@ -254,6 +429,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_01_000013) do
   add_foreign_key "session_summaries", "transcript_analyses"
   add_foreign_key "session_summaries", "transcripts"
   add_foreign_key "sessions", "students"
+  add_foreign_key "study_notes", "conversation_messages"
+  add_foreign_key "study_notes", "students"
   add_foreign_key "transcript_analyses", "transcripts"
   add_foreign_key "tutor_routing_events", "conversation_messages"
   add_foreign_key "tutor_routing_events", "sessions"

@@ -1,0 +1,394 @@
+.subject-detail-view {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.subject-detail-view.loading,
+.subject-detail-view.error {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.subject-detail-view.error {
+  color: #dc3545;
+}
+
+.detail-header {
+  margin-bottom: 24px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 0;
+  margin-bottom: 12px;
+  transition: color 0.2s;
+}
+
+.back-button:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.detail-header h2 {
+  margin: 0;
+  font-size: 32px;
+  color: #212529;
+}
+
+.mastery-overview {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.mastery-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.mastery-level-large {
+  font-size: 36px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mastery-details {
+  flex: 1;
+}
+
+.mastery-percentage {
+  font-size: 28px;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 4px;
+}
+
+.mastery-stats {
+  font-size: 14px;
+  color: #6c757d;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.mastery-progress-bar {
+  height: 12px;
+  background: #e9ecef;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mastery-progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 6px;
+}
+
+.detail-tabs {
+  display: flex;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 24px;
+  gap: 8px;
+}
+
+.detail-tabs button {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6c757d;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.detail-tabs button:hover {
+  color: #007bff;
+}
+
+.detail-tabs button.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+  font-weight: 600;
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+.overview-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.learning-concepts-section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.learning-concepts-section h3 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #212529;
+}
+
+.concepts-list,
+.topics-list {
+  margin-bottom: 20px;
+}
+
+.concepts-list:last-child,
+.topics-list:last-child {
+  margin-bottom: 0;
+}
+
+.concepts-list h4,
+.topics-list h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #495057;
+  font-weight: 600;
+}
+
+.concept-tags,
+.topic-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.concept-tag,
+.topic-tag {
+  background: #e7f3ff;
+  color: #0056b3;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.topic-tag {
+  background: #f0f0f0;
+  color: #495057;
+}
+
+.recent-sessions-preview,
+.goals-preview {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.recent-sessions-preview h3,
+.goals-preview h3 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #212529;
+}
+
+.sessions-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.view-all-button {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.view-all-button:hover {
+  background: #0056b3;
+}
+
+.goals-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.goal-preview-item {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.goal-preview-item .goal-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #212529;
+}
+
+.goal-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.goal-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: #007bff;
+  transition: width 0.3s ease;
+}
+
+.goal-progress span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  min-width: 40px;
+  text-align: right;
+}
+
+.sessions-tab h3,
+.goals-tab h3 {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  color: #212529;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.goals-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  color: #495057;
+  font-weight: 600;
+}
+
+.goal-item {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.goal-item.completed {
+  opacity: 0.7;
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.goal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+  flex: 1;
+}
+
+.goal-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.goal-status.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.goal-status.completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.goal-description {
+  color: #6c757d;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.goal-target-date,
+.goal-completed-date {
+  font-size: 14px;
+  color: #6c757d;
+  margin-top: 8px;
+}
+
+.practice-tab,
+.chat-tab {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+@media (max-width: 768px) {
+  .mastery-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .mastery-level-large {
+    font-size: 28px;
+  }
+
+  .detail-tabs {
+    flex-wrap: wrap;
+  }
+
+  .detail-tabs button {
+    flex: 1 1 auto;
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}
+
+

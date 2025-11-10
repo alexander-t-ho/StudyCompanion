@@ -1,6 +1,7 @@
 module Api
-  module Retention
-    class BaseController < ApplicationController
+  module V1
+    module Retention
+      class BaseController < ApplicationController
       before_action :authenticate_student!
 
       private
@@ -27,6 +28,7 @@ module Api
         nil
       end
     end
+  end
   end
 end
 

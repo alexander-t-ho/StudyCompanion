@@ -136,9 +136,9 @@ function AnalysisViewer({ analysis, transcriptId, onUpdate }) {
         <div className="meta-item">
           <strong>Model:</strong> {analysis.model_used}
         </div>
-        {analysis.analysis_cost && (
+        {analysis.analysis_cost != null && (
           <div className="meta-item">
-            <strong>Cost:</strong> ${analysis.analysis_cost.toFixed(4)}
+            <strong>Cost:</strong> ${Number(analysis.analysis_cost).toFixed(4)}
           </div>
         )}
         {analysis.token_count && (

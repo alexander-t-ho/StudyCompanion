@@ -1,0 +1,124 @@
+.nudge-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-width: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+  border: 2px solid #2563eb;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.nudge-content {
+  display: flex;
+  align-items: start;
+  padding: 20px;
+  gap: 15px;
+}
+
+.nudge-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.nudge-message {
+  flex: 1;
+}
+
+.nudge-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.nudge-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.nudge-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.nudge-close:hover {
+  color: #333;
+}
+
+.nudge-actions {
+  display: flex;
+  gap: 10px;
+  padding: 0 20px 20px 20px;
+}
+
+.nudge-button {
+  flex: 1;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.nudge-button.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.nudge-button.primary:hover {
+  background: #1d4ed8;
+}
+
+.nudge-button.secondary {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.nudge-button.secondary:hover {
+  background: #e5e7eb;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .nudge-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+
+
+
+
+
+
+

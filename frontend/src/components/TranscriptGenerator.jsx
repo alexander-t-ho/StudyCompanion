@@ -5,12 +5,14 @@ import './TranscriptGenerator.css'
 function TranscriptGenerator({ onGenerated }) {
   // Load API key from localStorage on mount
   const [formData, setFormData] = useState({
+    student_id: '',
     subject: 'SAT',
     topic: 'College Essays',
     student_level: 'intermediate',
     session_duration_minutes: 60,
     learning_objectives: 'Learn how to write compelling college application essays',
-    student_personality: 'Engaged and curious, sometimes struggles with confidence'
+    student_personality: 'Engaged and curious, sometimes struggles with confidence',
+    session_date: new Date().toISOString().split('T')[0] // Default to today
   })
   const [apiKey, setApiKey] = useState(() => {
     return localStorage.getItem('openai_api_key') || ''
@@ -24,6 +26,7 @@ function TranscriptGenerator({ onGenerated }) {
   const [error, setError] = useState(null)
   const [generatingObjectives, setGeneratingObjectives] = useState(false)
   const [generatingPersonality, setGeneratingPersonality] = useState(false)
+  const [generatingTopic, setGeneratingTopic] = useState(false)
 
   // Save API key to localStorage when it changes
   useEffect(() => {
@@ -52,33 +55,58 @@ function TranscriptGenerator({ onGenerated }) {
   }
 
   const handleGenerateRandom = async (field) => {
-    if (!formData.subject || !formData.topic) {
-      alert('Please select a subject and enter a topic first')
-      return
-    }
-
-    const loadingState = field === 'objectives' ? setGeneratingObjectives : setGeneratingPersonality
-    loadingState(true)
-    
-    try {
-      const apiKeyToSend = apiKey || undefined
-      const response = await transcriptsAPI.generateRandomFields(
-        formData.subject,
-        formData.topic,
-        formData.student_level,
-        apiKeyToSend,
-        useOpenRouter
-      )
-      
-      if (field === 'objectives') {
-        setFormData(prev => ({ ...prev, learning_objectives: response.data.learning_objectives }))
-      } else {
-        setFormData(prev => ({ ...prev, student_personality: response.data.student_personality }))
+    if (field === 'topic') {
+      // Topic generation only needs subject
+      if (!formData.subject) {
+        alert('Please select a subject first')
+        return
       }
-    } catch (err) {
-      alert('Failed to generate: ' + (err.response?.data?.error || err.message))
-    } finally {
-      loadingState(false)
+      
+      setGeneratingTopic(true)
+      try {
+        const apiKeyToSend = apiKey || undefined
+        const response = await transcriptsAPI.generateRandomTopic(
+          formData.subject,
+          formData.student_level,
+          apiKeyToSend,
+          useOpenRouter
+        )
+        setFormData(prev => ({ ...prev, topic: response.data.topic }))
+      } catch (err) {
+        alert('Failed to generate topic: ' + (err.response?.data?.error || err.message))
+      } finally {
+        setGeneratingTopic(false)
+      }
+    } else {
+      // Objectives and Personality need both subject and topic
+      if (!formData.subject || !formData.topic) {
+        alert('Please select a subject and enter a topic first')
+        return
+      }
+
+      const loadingState = field === 'objectives' ? setGeneratingObjectives : setGeneratingPersonality
+      loadingState(true)
+      
+      try {
+        const apiKeyToSend = apiKey || undefined
+        const response = await transcriptsAPI.generateRandomFields(
+          formData.subject,
+          formData.topic,
+          formData.student_level,
+          apiKeyToSend,
+          useOpenRouter
+        )
+        
+        if (field === 'objectives') {
+          setFormData(prev => ({ ...prev, learning_objectives: response.data.learning_objectives }))
+        } else {
+          setFormData(prev => ({ ...prev, student_personality: response.data.student_personality }))
+        }
+      } catch (err) {
+        alert('Failed to generate: ' + (err.response?.data?.error || err.message))
+      } finally {
+        loadingState(false)
+      }
     }
   }
 
@@ -94,6 +122,7 @@ function TranscriptGenerator({ onGenerated }) {
       // Prepare submission data for tutoring sessions
       const submissionData = {
         ...formData,
+        session_date: formData.session_date, // Include session_date
         use_gpt4o: useGPT4o,
         transcript_format: transcriptFormat
       }
@@ -106,12 +135,14 @@ function TranscriptGenerator({ onGenerated }) {
       onGenerated()
       alert('Transcript generated successfully!')
       setFormData({
+        student_id: formData.student_id, // Keep student_id
         subject: '',
         topic: '',
         student_level: 'intermediate',
         session_duration_minutes: 60,
         learning_objectives: '',
-        student_personality: ''
+        student_personality: '',
+        session_date: new Date().toISOString().split('T')[0] // Reset to today
       })
     } catch (err) {
       setError(err.response?.data?.error || err.message || 'Failed to generate transcript')
@@ -172,6 +203,22 @@ function TranscriptGenerator({ onGenerated }) {
         </div>
 
         <div className="form-group">
+          <label>Student ID *</label>
+          <input
+            type="number"
+            name="student_id"
+            value={formData.student_id}
+            onChange={handleChange}
+            required
+            placeholder="Enter student ID (e.g., 1)"
+            min="1"
+          />
+          <small style={{ color: '#666', fontSize: '0.9em' }}>
+            Required: Transcripts are now associated with students, not goals, so students can study multiple subjects.
+          </small>
+        </div>
+
+        <div className="form-group">
           <label>Subject *</label>
           <select
             name="subject"
@@ -199,7 +246,26 @@ function TranscriptGenerator({ onGenerated }) {
         </div>
 
         <div className="form-group">
-          <label>Topic *</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <label>Topic *</label>
+            <button
+              type="button"
+              onClick={() => handleGenerateRandom('topic')}
+              disabled={generatingTopic || !formData.subject}
+              style={{
+                padding: '0.25rem 0.75rem',
+                fontSize: '0.85rem',
+                backgroundColor: '#667eea',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: generatingTopic ? 'not-allowed' : 'pointer',
+                opacity: (generatingTopic || !formData.subject) ? 0.6 : 1
+              }}
+            >
+              {generatingTopic ? 'Generating...' : 'Generate Random'}
+            </button>
+          </div>
           <input
             type="text"
             name="topic"
@@ -208,6 +274,9 @@ function TranscriptGenerator({ onGenerated }) {
             required
             placeholder={formData.subject === 'SAT' ? 'e.g., College Essays, Study Skills, AP Prep' : 'e.g., Specific topic within the AP subject'}
           />
+          <small style={{ color: '#666', fontSize: '0.9em' }}>
+            Topic will be generated based on the selected subject.
+          </small>
         </div>
 
         <div className="form-group">
@@ -235,6 +304,20 @@ function TranscriptGenerator({ onGenerated }) {
             min="15"
             max="120"
           />
+        </div>
+
+        <div className="form-group">
+          <label>Session Date *</label>
+          <input
+            type="date"
+            name="session_date"
+            value={formData.session_date}
+            onChange={handleChange}
+            required
+          />
+          <small style={{ color: '#666', fontSize: '0.9em' }}>
+            Select the date for this session. You can choose past or future dates to simulate sessions at different times.
+          </small>
         </div>
 
         <div className="form-group">

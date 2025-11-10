@@ -4,6 +4,7 @@ class Transcript < ApplicationRecord
   has_one :transcript_analysis, dependent: :destroy
   has_many :session_summaries, dependent: :nullify
 
+  validates :student_id, presence: true
   validates :subject, presence: true, unless: -> { generation_parameters&.dig('transcript_type') == 'meeting' }
   validates :topic, presence: true
   validates :student_level, presence: true, unless: -> { generation_parameters&.dig('transcript_type') == 'meeting' }

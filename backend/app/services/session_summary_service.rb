@@ -42,6 +42,10 @@ class SessionSummaryService
       embedding_text = build_embedding_text(transcript, analysis)
       embeddings = @embedding_service.generate(embedding_text)
 
+      # Get understanding level from transcript if available
+      understanding_level = transcript.understanding_level
+      previous_understanding_level = transcript.previous_understanding_level
+
       # Update summary
       summary.update!(
         extracted_topics: extracted_topics,
@@ -50,6 +54,8 @@ class SessionSummaryService
         strengths_identified: strengths,
         areas_for_improvement: improvements,
         embeddings: embeddings,
+        understanding_level: understanding_level,
+        previous_understanding_level: previous_understanding_level,
         processing_status: 'completed',
         processed_at: Time.current
       )
@@ -111,6 +117,16 @@ class SessionSummaryService
     
     parts << "Subject: #{transcript.subject}"
     parts << "Topic: #{transcript.topic}"
+    
+    # Include understanding level for better semantic search
+    if transcript.understanding_level.present?
+      parts << "Student Understanding Level: #{transcript.understanding_level.round(1)}%"
+      if transcript.previous_understanding_level.present? && transcript.previous_understanding_level > 0
+        progress = transcript.understanding_level - transcript.previous_understanding_level
+        parts << "Understanding Progress: #{progress > 0 ? '+' : ''}#{progress.round(1)}%"
+      end
+    end
+    
     parts << transcript.transcript_content
     
     if analysis

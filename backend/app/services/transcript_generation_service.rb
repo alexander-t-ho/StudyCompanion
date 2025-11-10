@@ -122,6 +122,8 @@ class TranscriptGenerationService
   end
 
   def build_structured_tutoring_prompt(subject, topic, params, subject_guidance)
+    understanding_context = build_understanding_context(params)
+    
     <<~PROMPT
       Generate a structured tutoring session transcript in a professional format similar to meeting notes. Based on the following information:
 
@@ -131,6 +133,8 @@ class TranscriptGenerationService
       Session Duration: #{params[:session_duration_minutes]} minutes
       Learning Objectives: #{params[:learning_objectives]}
       Student Personality/Engagement Style: #{params[:student_personality]}
+
+      #{understanding_context}
 
       Subject-Specific Guidance:
       #{subject_guidance}
@@ -180,6 +184,8 @@ class TranscriptGenerationService
   end
 
   def build_conversational_tutoring_prompt(subject, topic, params, subject_guidance)
+    understanding_context = build_understanding_context(params)
+    
     <<~PROMPT
       Generate a realistic tutor-student conversation transcript for a tutoring session.
 
@@ -189,6 +195,8 @@ class TranscriptGenerationService
       Session Duration: #{params[:session_duration_minutes]} minutes
       Learning Objectives: #{params[:learning_objectives]}
       Student Personality/Engagement Style: #{params[:student_personality]}
+
+      #{understanding_context}
 
       Subject-Specific Guidance:
       #{subject_guidance}
@@ -205,6 +213,62 @@ class TranscriptGenerationService
 
       Generate the transcript now:
     PROMPT
+  end
+
+  # Build understanding context for prompts
+  def build_understanding_context(params)
+    return "" unless params[:understanding_level].present?
+
+    understanding_level = params[:understanding_level]
+    previous_level = params[:previous_understanding_level] || 0.0
+    goals_snapshot = params[:goals_snapshot] || {}
+    session_history = params[:session_history_summary] || {}
+
+    context_parts = []
+    
+    # Understanding level
+    context_parts << "Student Understanding Level: #{understanding_level.round(1)}%"
+    if previous_level > 0.0
+      progress = understanding_level - previous_level
+      progress_text = progress > 0 ? "improved by #{progress.round(1)}%" : progress < 0 ? "decreased by #{progress.abs.round(1)}%" : "maintained"
+      context_parts << "Previous Understanding: #{previous_level.round(1)}% (has #{progress_text} since last session)"
+    else
+      context_parts << "This is the student's first session in this subject."
+    end
+
+    # Goals context (using string keys for JSONB compatibility)
+    if goals_snapshot.is_a?(Hash) && goals_snapshot['active_goals']&.any?
+      active_goals = goals_snapshot['active_goals']
+      goals_text = active_goals.map { |g| 
+        "#{g['title'] || g['goal_type']} (#{g['progress']}% complete)" 
+      }.join(', ')
+      context_parts << "Active Goals: #{goals_text}"
+    end
+
+    # Session history (using string keys for JSONB compatibility)
+    if session_history.is_a?(Hash)
+      if session_history['total_sessions_this_subject']&.positive?
+        context_parts << "Total Sessions in Subject: #{session_history['total_sessions_this_subject']}"
+      end
+      
+      if session_history['days_since_last_session']
+        context_parts << "Days Since Last Session: #{session_history['days_since_last_session']}"
+      end
+      
+      if session_history['topics_covered']&.any?
+        topics = session_history['topics_covered'].first(5).join(', ')
+        context_parts << "Previously Covered Topics: #{topics}"
+      end
+      
+      if session_history['concepts_struggling']&.any?
+        struggling = session_history['concepts_struggling'].first(3).join(', ')
+        context_parts << "Areas Still Struggling: #{struggling}"
+      end
+    end
+
+    return "" if context_parts.empty?
+
+    "Student Progress Context:\n#{context_parts.join("\n")}\n\n"
   end
 
   def generate_via_openai(prompt, params)
