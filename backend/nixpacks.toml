@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["ruby_3_2", "bundler"]
+
+[phases.install]
+cmds = ["bundle install"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "bundle exec puma -C config/puma.rb"
+
