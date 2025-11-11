@@ -1,0 +1,13 @@
+frontend/
+md files/
+*.md
+!README.md
+.gitignore
+DEPLOY_*.md
+SEED_*.md
+seed_*.md
+test_*.json
+test_*.rb
+test_*.sh
+*.sh
+!backend/**/*.sh
