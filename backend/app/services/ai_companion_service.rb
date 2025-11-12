@@ -6,9 +6,11 @@ require 'stringio'
 class AiCompanionService
   def initialize(api_key: nil, use_openrouter: false)
     @api_key = api_key || ENV['OPENAI_API_KEY']
-    @use_openrouter = use_openrouter || ENV['USE_OPENROUTER'] == 'true'
+    # Only use OpenRouter if explicitly set to true AND we have a key
+    # Don't fall back to ENV if use_openrouter is explicitly false
+    @use_openrouter = use_openrouter == true && ENV['OPENROUTER_API_KEY'].present?
     @openrouter_api_key = ENV['OPENROUTER_API_KEY']
-    @rag_service = RagService.new(api_key: api_key, use_openrouter: use_openrouter)
+    @rag_service = RagService.new(api_key: api_key, use_openrouter: use_openrouter == true)
   end
 
   # Main chat method - handles user messages and generates AI responses
@@ -23,6 +25,9 @@ class AiCompanionService
     end
     
     # Retrieve relevant context using RAG (scoped to subject if provided)
+    # If embedding generation fails, continue without context (graceful degradation)
+    contexts = []
+    begin
     contexts = @rag_service.retrieve_context(
       student_id: student.id,
       query: message,
@@ -30,6 +35,10 @@ class AiCompanionService
       similarity_threshold: 0.7,
       subject: context[:subject]
     )
+    rescue => e
+      Rails.logger.warn "Failed to retrieve RAG context: #{e.message}. Continuing without context."
+      contexts = []
+    end
     
     # Build conversation prompt
     prompt = build_conversation_prompt(
@@ -56,12 +65,22 @@ class AiCompanionService
     
     unless is_homework_help
       # Check if handoff is needed before generating response (only for non-homework chats)
-      routing_service = TutorRoutingService.new(api_key: @api_key, use_openrouter: @use_openrouter)
-      routing_check = routing_service.check_routing_needed(
-        student: student,
-        conversation_context: context
-      )
-      should_route = routing_check[:routing_needed] && routing_check[:confidence] >= 0.7
+      # Only check routing after 30+ interactions in the session
+      recent_conversation = get_recent_conversation(student, limit: 35, practice_problem_id: context[:practice_problem_id], subject: context[:subject])
+      user_message_count = recent_conversation.count { |m| m.role == 'user' }
+      
+      # Only check routing if we have 30+ user interactions
+      if user_message_count >= 30
+        routing_service = TutorRoutingService.new(api_key: @api_key, use_openrouter: @use_openrouter)
+        routing_check = routing_service.check_routing_needed(
+          student: student,
+          conversation_context: context
+        )
+        should_route = routing_check[:routing_needed] && routing_check[:confidence] >= 0.7
+      else
+        routing_check = { routing_needed: false, confidence: 0.0, reason: "Only #{user_message_count} interactions, need 30+ for handoff" }
+        should_route = false
+      end
     else
       # For homework help, check routing but NEVER tell the student
       # Get recent conversation count for this homework session
@@ -255,6 +274,23 @@ class AiCompanionService
     misconceptions = identify_misconceptions(recent_conversation)
     misconception_text = misconceptions.any? ? "\n\nKnown Misconceptions: #{misconceptions.join('; ')}" : ""
     
+    # Detect if student is showing confusion
+    shows_confusion = detect_confusion_response(message)
+    confusion_instruction = ""
+    if shows_confusion
+      confusion_instruction = <<~CONFUSION
+      
+      ⚠️ STUDENT IS SHOWING CONFUSION - SPECIAL HANDLING REQUIRED:
+      The student's message indicates they don't understand something. You MUST:
+      1. Immediately explain the relationship between the key variables/concepts in the problem
+      2. Explain how understanding this relationship helps towards solving the problem
+      3. Break down the relationship into simple, understandable terms
+      4. Use concrete examples if possible
+      5. Then ask a guiding question to help them apply this understanding
+      6. Be patient and encouraging - they need extra support right now
+      CONFUSION
+    end
+    
     # Get problem attempt summary if practice problem exists
     problem_attempt_summary = ""
     if practice_problem
@@ -350,6 +386,7 @@ class AiCompanionService
       #{context_emphasis}
 
       Current Question: #{message}
+      #{confusion_instruction}
 
       Provide a helpful, conversational response using the Socratic method that:
       1. References specific topics, concepts, examples, and explanations from the student's tutoring session transcripts above
@@ -407,6 +444,38 @@ class AiCompanionService
   end
 
   # Identify misconceptions from conversation history
+  def detect_confusion_response(message)
+    return false if message.blank?
+    
+    message_lower = message.downcase.strip
+    
+    # Patterns that indicate confusion or lack of understanding
+    confusion_patterns = [
+      /i don'?t know/i,
+      /i'?m confused/i,
+      /i don'?t understand/i,
+      /not sure/i,
+      /unclear/i,
+      /confused/i,
+      /don'?t get it/i,
+      /doesn'?t make sense/i,
+      /don'?t see how/i,
+      /can'?t figure out/i,
+      /no idea/i,
+      /lost/i,
+      /stuck/i,
+      /what\?/i,
+      /huh\?/i,
+      /i have no clue/i,
+      /i'?m lost/i,
+      /makes no sense/i,
+      /don'?t know what/i,
+      /unsure/i
+    ]
+    
+    confusion_patterns.any? { |pattern| message_lower.match?(pattern) }
+  end
+
   def identify_misconceptions(conversation_messages)
     misconceptions = []
     
@@ -677,22 +746,38 @@ class AiCompanionService
   end
 
   def generate_response(prompt, response_format: nil, is_homework_help: false)
-    if @use_openrouter && @openrouter_api_key
-      generate_via_openrouter(prompt, response_format, is_homework_help: is_homework_help)
+    if @use_openrouter && @openrouter_api_key.present?
+      begin
+        generate_via_openrouter(prompt, response_format, is_homework_help: is_homework_help)
+      rescue => e
+        Rails.logger.warn "OpenRouter generation failed, falling back to OpenAI: #{e.message}"
+        # Fallback to OpenAI if OpenRouter fails
+        generate_via_openai(prompt, response_format, is_homework_help: is_homework_help)
+      end
     else
       generate_via_openai(prompt, response_format, is_homework_help: is_homework_help)
     end
   end
 
   def generate_multimodal_response(prompt, image_attachments, is_homework_help: false)
-    if @use_openrouter && @openrouter_api_key
-      generate_multimodal_via_openrouter(prompt, image_attachments, is_homework_help: is_homework_help)
+    if @use_openrouter && @openrouter_api_key.present?
+      begin
+        generate_multimodal_via_openrouter(prompt, image_attachments, is_homework_help: is_homework_help)
+      rescue => e
+        Rails.logger.warn "OpenRouter multimodal generation failed, falling back to OpenAI: #{e.message}"
+        # Fallback to OpenAI if OpenRouter fails
+        generate_multimodal_via_openai(prompt, image_attachments, is_homework_help: is_homework_help)
+      end
     else
       generate_multimodal_via_openai(prompt, image_attachments, is_homework_help: is_homework_help)
     end
   end
 
   def generate_via_openai(prompt, response_format = nil, is_homework_help: false)
+    unless @api_key.present?
+      raise 'OpenAI API key is required but not provided. Please set OPENAI_API_KEY environment variable or provide api_key parameter.'
+    end
+
     client = OpenAI::Client.new(access_token: @api_key)
     # Use GPT-4o for homework help, gpt-4o-mini for regular chats
     model = is_homework_help ? 'gpt-4o' : 'gpt-4o-mini'
@@ -867,6 +952,12 @@ class AiCompanionService
       You are a concise, Socratic tutor helping students with their homework. 
       Your role is to guide students to discover answers themselves, not to give direct answers.
       
+      CRITICAL RULES - NEVER VIOLATE THESE:
+      1. NEVER give the final answer to any homework problem
+      2. NEVER provide complete solutions or final numerical answers
+      3. You can give small answers that help towards the final answer (partial steps, explanations of concepts, relationships between variables)
+      4. If the student shows confusion or says "I don't know" (or equivalent), explain the relationship between variables and how it helps towards the final answer
+      
       Guidelines:
       1. Provide help in 2-4 sentences maximum
       2. Use the Socratic method: ask guiding questions rather than giving direct answers
@@ -874,13 +965,18 @@ class AiCompanionService
          - Use \\( ... \\) for inline math (e.g., \\(x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}\\))
          - Use \\[ ... \\] for block/display math (e.g., \\[E = mc^2\\])
          - Always use LaTeX for any mathematical expressions, equations, formulas, or symbols
-      4. Never provide the final numerical answer or complete solution
-      5. Focus on helping students understand the approach and next steps
-      6. If the student asks for the answer, politely redirect by asking a question about the first step
+      4. Focus on helping students understand the approach, relationships between variables, and next steps
+      5. If the student asks for the answer, politely redirect by asking a question about the first step
+      6. DETECT CONFUSION: If the student says "I don't know", "I'm confused", "I don't understand", "not sure", "unclear", or similar expressions:
+         - Immediately explain the relationship between the key variables in the problem
+         - Explain how understanding this relationship helps towards solving the problem
+         - Break down the relationship into simple, understandable terms
+         - Then ask a guiding question to help them apply this understanding
       7. Be encouraging and supportive
       8. Analyze any images provided carefully and reference specific elements when helpful
       9. NEVER suggest talking to a tutor or booking a session - always continue helping the student
       10. Continue helping even if the student is struggling - your job is to guide them through the problem
+      11. Give small hints and explanations that build understanding step-by-step, but never reveal the final answer
     PROMPT
   end
 

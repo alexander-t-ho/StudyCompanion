@@ -43,28 +43,20 @@ const StudentDashboardTest = ({ studentId: propStudentId }) => {
         if (isMounted) {
           setStudentId(currentUser.id)
         }
-      }
-    }
-    
-    // Check immediately
-    checkAndSetStudentId()
-    
-    // Also check after a short delay in case localStorage wasn't ready
-    const timer = setTimeout(() => {
-      if (isMounted) {
-        checkAndSetStudentId()
-        // If still no studentId, show error
-        const checkUser = authApi.getCurrentUser()
-        if (!checkUser?.id && !propStudentId) {
+      } else {
+        // If no studentId and no currentUser, set error immediately
+        if (isMounted) {
           setLoadingSubjects(false)
           setSubjectsError('Unable to load student information. Please log in again.')
         }
       }
-    }, 100)
+    }
+    
+    // Check immediately - localStorage is synchronous, no delay needed
+    checkAndSetStudentId()
     
     return () => {
       isMounted = false
-      clearTimeout(timer)
     }
   }, [propStudentId]) // Only depend on propStudentId to avoid infinite loops
   

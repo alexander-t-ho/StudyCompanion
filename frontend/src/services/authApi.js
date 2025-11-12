@@ -29,8 +29,17 @@ export const authApi = {
   },
 
   getCurrentUser: () => {
-    const userStr = localStorage.getItem('current_user')
-    return userStr ? JSON.parse(userStr) : null
+    try {
+      const userStr = localStorage.getItem('current_user')
+      if (!userStr) return null
+      return JSON.parse(userStr)
+    } catch (e) {
+      // If JSON is corrupted, clear it and return null
+      console.error('Failed to parse current_user from localStorage:', e)
+      localStorage.removeItem('current_user')
+      localStorage.removeItem('auth_token') // Also clear token since user data is invalid
+      return null
+    }
   },
 
   getToken: () => {

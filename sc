@@ -7,7 +7,7 @@ PROJECT_ROOT="${SCRIPT_DIR}"
 
 # Configuration
 BACKEND_PORT=3002
-FRONTEND_PORT=3000
+FRONTEND_PORT=3001
 BACKEND_LOG="/tmp/studycompanion_backend.log"
 FRONTEND_LOG="/tmp/studycompanion_frontend.log"
 STARTUP_WAIT_TIME=5

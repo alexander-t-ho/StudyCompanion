@@ -3,13 +3,21 @@
 class EmbeddingService
   def initialize(api_key: nil, use_openrouter: false)
     @api_key = api_key || ENV['OPENAI_API_KEY']
-    @use_openrouter = use_openrouter || ENV['USE_OPENROUTER'] == 'true'
+    # Only use OpenRouter if explicitly set to true AND we have a key
+    # Don't fall back to ENV if use_openrouter is explicitly false
+    @use_openrouter = use_openrouter == true && ENV['OPENROUTER_API_KEY'].present?
     @openrouter_api_key = ENV['OPENROUTER_API_KEY']
   end
 
   def generate(text, model: 'text-embedding-3-small')
-    if @use_openrouter && @openrouter_api_key
-      generate_via_openrouter(text, model)
+    if @use_openrouter && @openrouter_api_key.present?
+      begin
+        generate_via_openrouter(text, model)
+      rescue => e
+        Rails.logger.warn "OpenRouter embedding failed, falling back to OpenAI: #{e.message}"
+        # Fallback to OpenAI if OpenRouter fails
+        generate_via_openai(text, model)
+      end
     else
       generate_via_openai(text, model)
     end
@@ -18,6 +26,10 @@ class EmbeddingService
   private
 
   def generate_via_openai(text, model)
+    unless @api_key.present?
+      raise 'OpenAI API key is required but not provided'
+    end
+
     client = OpenAI::Client.new(access_token: @api_key)
 
     response = client.embeddings(

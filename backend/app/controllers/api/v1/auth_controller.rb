@@ -12,28 +12,34 @@ module Api
           return render json: { error: 'Username and password are required' }, status: :bad_request
         end
 
-        student = Student.find_by(username: username)
-        Rails.logger.info "Student found: #{student.present?}, Student ID: #{student&.id}"
+        begin
+          student = Student.find_by(username: username)
+          Rails.logger.info "Student found: #{student.present?}, Student ID: #{student&.id}"
 
-        if student && student.authenticate(password)
-          # Generate or use existing authentication token
-          token = student.authentication_token || SecureRandom.hex(32)
-          student.update(authentication_token: token) unless student.authentication_token
+          if student && student.authenticate(password)
+            # Generate or use existing authentication token
+            token = student.authentication_token || SecureRandom.hex(32)
+            student.update(authentication_token: token) unless student.authentication_token
 
-          Rails.logger.info "Login successful for student #{student.id}"
-          render json: {
-            token: token,
-            student: {
-              id: student.id,
-              username: student.username,
-              email: student.email,
-              name: student.name,
-              is_admin: student.is_admin
+            Rails.logger.info "Login successful for student #{student.id}"
+            render json: {
+              token: token,
+              student: {
+                id: student.id,
+                username: student.username,
+                email: student.email,
+                name: student.name,
+                is_admin: student.is_admin
+              }
             }
-          }
-        else
-          Rails.logger.warn "Login failed - Invalid credentials for username: #{username.inspect}"
-          render json: { error: 'Invalid username or password' }, status: :unauthorized
+          else
+            Rails.logger.warn "Login failed - Invalid credentials for username: #{username.inspect}"
+            render json: { error: 'Invalid username or password' }, status: :unauthorized
+          end
+        rescue => e
+          Rails.logger.error "Login error: #{e.class} - #{e.message}"
+          Rails.logger.error e.backtrace.join("\n")
+          render json: { error: 'An error occurred during login. Please try again.' }, status: :internal_server_error
         end
       end
 

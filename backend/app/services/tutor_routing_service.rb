@@ -65,7 +65,8 @@ class TutorRoutingService
       query = query.where("context->>'subject' = ?", subject)
     end
     
-    query.order(created_at: :desc).limit(20).reverse
+    # Get more messages to properly check for 30+ interactions
+    query.order(created_at: :desc).limit(35).reverse
   end
 
   # Check for explicit handoff triggers (fast path before LLM analysis)
@@ -92,12 +93,12 @@ class TutorRoutingService
       end
     end
     
-    # 2. High interaction count (>10 turns on single problem)
+    # 2. High interaction count (>30 turns on single problem)
     if practice_problem_id.present?
       problem_messages = recent_messages.select { |m| 
         m.context&.dig('practice_problem_id') == practice_problem_id.to_s 
       }
-      if problem_messages.length > 10
+      if problem_messages.length > 30
         triggers << 'high_interaction_count'
         confidence = [confidence, 0.8].max
       end
@@ -358,7 +359,7 @@ class TutorRoutingService
       #{conversation_context.to_json}
       
       Determine if routing to a human tutor is needed based on these triggers:
-      1. High Interaction Count: >10 conversational turns on a single problem
+      1. High Interaction Count: >30 conversational turns on a single problem
       2. No Progress: Student's mastery score for the sub-topic has not increased after 3 consecutive attempts/guidance sessions
       3. Frustration/Emotional Cues: Keywords like "stuck," "give up," "hate," or repeated exclamations
       4. Explicit Request: Student types "human," "real person," "tutor"

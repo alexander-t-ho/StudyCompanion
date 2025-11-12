@@ -139,7 +139,15 @@ module Api
           render json: response_data, status: :created
         rescue => e
           Rails.logger.error "Chat error: #{e.message}\n#{e.backtrace.join("\n")}"
-          render json: { error: e.message }, status: :unprocessable_entity
+          # Provide more helpful error messages
+          error_message = if e.message.include?('API key')
+            e.message
+          elsif e.message.include?('401') || e.message.include?('Unauthorized')
+            'API authentication failed. Please check your API key configuration.'
+          else
+            e.message
+          end
+          render json: { error: error_message }, status: :unprocessable_entity
         end
 
         def history

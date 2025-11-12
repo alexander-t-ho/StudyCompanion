@@ -94,6 +94,7 @@ function App() {
 
   // Protected Route component
   const ProtectedRoute = ({ children, requireAdmin = false }) => {
+    // Check auth synchronously - localStorage is immediate, no need for state
     if (!authApi.isAuthenticated()) {
       return <Navigate to="/login" replace />
     }
@@ -107,9 +108,14 @@ function App() {
     <Routes>
       {/* Login Route */}
       <Route path="/login" element={
-        authApi.isAuthenticated() ? (
-          authApi.isAdmin() ? <Navigate to="/admin" replace /> : <Navigate to="/main" replace />
-        ) : <Login />
+        (() => {
+          // Check auth synchronously
+          const isAuth = authApi.isAuthenticated()
+          if (isAuth) {
+            return authApi.isAdmin() ? <Navigate to="/admin" replace /> : <Navigate to="/main" replace />
+          }
+          return <Login />
+        })()
       } />
 
       {/* Student Dashboard Routes */}
@@ -153,7 +159,26 @@ function App() {
         </ProtectedRoute>
       } />
 
-      <Route path="/" element={<Navigate to="/main" replace />} />
+      <Route path="/" element={
+        (() => {
+          try {
+            // Check auth synchronously and redirect appropriately
+            const isAuth = authApi.isAuthenticated()
+            if (!isAuth) {
+              return <Navigate to="/login" replace />
+            }
+            // If authenticated, redirect based on user type
+            if (authApi.isAdmin()) {
+              return <Navigate to="/admin" replace />
+            }
+            return <Navigate to="/main" replace />
+          } catch (error) {
+            // If there's an error (e.g., corrupted localStorage), go to login
+            console.error('Error checking authentication:', error)
+            return <Navigate to="/login" replace />
+          }
+        })()
+      } />
       
       {/* Legacy Tab-based Routes */}
       <Route path="*" element={

@@ -5,9 +5,10 @@ require 'set'
 
 class RagService
   def initialize(api_key: nil, use_openrouter: false)
-    @embedding_service = EmbeddingService.new(api_key: api_key, use_openrouter: use_openrouter)
+    # Only use OpenRouter if explicitly set to true
+    @use_openrouter = use_openrouter == true
+    @embedding_service = EmbeddingService.new(api_key: api_key, use_openrouter: @use_openrouter)
     @api_key = api_key || ENV['OPENAI_API_KEY']
-    @use_openrouter = use_openrouter || ENV['USE_OPENROUTER'] == 'true'
   end
 
   # Retrieve relevant context for a query

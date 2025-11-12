@@ -32,7 +32,8 @@ Rails.application.configure do
   end
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :amazon
+  # Temporarily using local storage - switch to :amazon when AWS credentials are configured
+  config.active_storage.service = ENV['AWS_S3_BUCKET'].present? ? :amazon : :local
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
@@ -57,8 +58,8 @@ Rails.application.configure do
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
 
-  # Suppress logger output for asset requests.
-  config.assets.quiet = true
+  # Suppress logger output for asset requests (only if assets are enabled)
+  # config.assets.quiet = true  # Commented out for API-only app
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true

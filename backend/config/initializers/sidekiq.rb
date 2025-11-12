@@ -1,10 +1,12 @@
-require 'sidekiq'
+# Only configure Sidekiq if Redis URL is available
+if ENV['REDIS_URL'].present?
+  require 'sidekiq'
 
-Sidekiq.configure_server do |config|
-  config.redis = { url: ENV['REDIS_URL'] || 'redis://localhost:6379/0' }
+  Sidekiq.configure_server do |config|
+    config.redis = { url: ENV['REDIS_URL'] }
+  end
+
+  Sidekiq.configure_client do |config|
+    config.redis = { url: ENV['REDIS_URL'] }
+  end
 end
-
-Sidekiq.configure_client do |config|
-  config.redis = { url: ENV['REDIS_URL'] || 'redis://localhost:6379/0' }
-end
-
