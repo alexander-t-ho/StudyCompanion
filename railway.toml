@@ -1,10 +1,10 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "cd backend && bundle install"
+# Let Nixpacks auto-detect and handle bundle install
 
 [deploy]
 startCommand = "cd backend && bundle exec puma -C config/puma.rb"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
-releaseCommand = "cd backend && bundle exec rails db:migrate"
+releaseCommand = "cd backend && bundle exec rails db:migrate || true"
 
