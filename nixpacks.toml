@@ -1,0 +1,10 @@
+# Nixpacks configuration for Rails app in backend subdirectory
+[phases.setup]
+nixPkgs = ["ruby_3_2_0", "bundler", "postgresql"]
+
+[phases.install]
+cmds = ["cd backend && bundle install"]
+
+[start]
+cmd = "cd backend && bundle exec puma -C config/puma.rb"
+
