@@ -1,7 +1,5 @@
 # Nixpacks configuration for Rails app in backend subdirectory
-[phases.setup]
-nixPkgs = ["ruby_3_2_0", "bundler", "postgresql"]
-
+# Let Nixpacks auto-detect Ruby version from Gemfile
 [phases.install]
 cmds = ["cd backend && bundle install"]
 
