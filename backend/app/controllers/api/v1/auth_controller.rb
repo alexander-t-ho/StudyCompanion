@@ -13,8 +13,9 @@ module Api
         end
 
         begin
-          student = Student.find_by(username: username)
-          Rails.logger.info "Student found: #{student.present?}, Student ID: #{student&.id}"
+          # Try to find by username (case-insensitive)
+          student = Student.where("LOWER(username) = ?", username.downcase.strip).first
+          Rails.logger.info "Student found: #{student.present?}, Student ID: #{student&.id}, Username searched: #{username.inspect}"
 
           if student && student.authenticate(password)
             # Generate or use existing authentication token
