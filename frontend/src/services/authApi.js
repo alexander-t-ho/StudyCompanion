@@ -2,17 +2,36 @@ import api from './api'
 
 export const authApi = {
   login: async (username, password) => {
-    const response = await api.post('/auth/login', {
-      username,
-      password
-    })
-    
-    if (response.data.token) {
-      localStorage.setItem('auth_token', response.data.token)
-      localStorage.setItem('current_user', JSON.stringify(response.data.student))
+    try {
+      const response = await api.post('/auth/login', {
+        username,
+        password
+      })
+      
+      if (response.data && response.data.token) {
+        localStorage.setItem('auth_token', response.data.token)
+        localStorage.setItem('current_user', JSON.stringify(response.data.student))
+        return response.data
+      } else {
+        throw new Error('Invalid response from server')
+      }
+    } catch (error) {
+      // Log the full error for debugging
+      console.error('Login error:', error)
+      console.error('Error response:', error.response)
+      
+      // Re-throw with a more user-friendly message
+      if (error.response) {
+        // Server responded with error
+        throw error
+      } else if (error.request) {
+        // Request was made but no response received
+        throw new Error('Unable to connect to server. Please check your connection.')
+      } else {
+        // Something else happened
+        throw new Error('An unexpected error occurred. Please try again.')
+      }
     }
-    
-    return response.data
   },
 
   logout: async () => {
