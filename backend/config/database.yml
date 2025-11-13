@@ -16,5 +16,11 @@ test:
 
 production:
   <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
+  url: <%= ENV['DATABASE_URL'] || ENV['RAILWAY_SERVICE_POSTGRES_URL'] %>
+  # Connection pool settings for production
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # Connection timeout
+  connect_timeout: 10
+  # Reconnect on connection loss
+  reconnect: true
 
