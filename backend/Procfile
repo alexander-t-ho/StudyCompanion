@@ -1,3 +1,3 @@
 web: bundle exec puma -C config/puma.rb
-release: bundle exec rails db:create 2>/dev/null || true && bundle exec rails db:migrate || true
+release: bundle exec rails db:create 2>/dev/null || true && bundle exec rails db:migrate || true && (bundle exec rails db:seed RAILS_ENV=production 2>/dev/null || true)
 
