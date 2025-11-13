@@ -1,0 +1,227 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  logoUrl       String?   @map("logo_url") // S3 URL or base64 data URL
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  documents     Document[]
+  documentVersions DocumentVersion[]
+  sectionVersions  SectionVersion[]
+  documentAnalyses DocumentAnalysis[]
+  
+  @@map("users")
+}
+
+model Template {
+  id            String    @id @default(cuid())
+  name          String
+  content       String?   @db.Text
+  styleMetadata Json?     @map("style_metadata")
+  toneMetadata  Json?     @map("tone_metadata")
+  isDefault     Boolean   @default(false) @map("is_default")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  documents     Document[]
+  
+  @@map("templates")
+}
+
+model Document {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  templateId    String?   @map("template_id")
+  filename      String
+  status        String    @default("draft") // draft, generating, completed, archived
+  metadata      Json?
+  currentVersion Int?     @default(0) @map("current_version")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template      Template? @relation(fields: [templateId], references: [id])
+  sections      DocumentSection[]
+  sourceDocs    SourceDocument[]
+  medicalProviders MedicalProvider[]
+  transcriptions Transcription[]
+  generationHistory GenerationHistory[]
+  versions      DocumentVersion[]
+  analyses      DocumentAnalysis[]
+  
+  @@map("documents")
+}
+
+model DocumentSection {
+  id            String    @id @default(cuid())
+  documentId    String    @map("document_id")
+  sectionType   String    @map("section_type") // introduction, liability, damages, etc.
+  content       String    @db.Text
+  order         Int
+  isGenerated   Boolean   @default(false) @map("is_generated")
+  currentVersion Int?     @default(0) @map("current_version")
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  versions      SectionVersion[]
+  analysisPointUsages AnalysisPointUsage[]
+  
+  @@unique([documentId, sectionType])
+  @@map("document_sections")
+}
+
+model SourceDocument {
+  id            String    @id @default(cuid())
+  documentId    String    @map("document_id")
+  filename      String
+  s3Key         String    @map("s3_key")
+  fileType      String    @map("file_type") // pdf, docx
+  extractedText String?   @db.Text @map("extracted_text")
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  analyses      DocumentAnalysis[]
+  
+  @@map("source_documents")
+}
+
+model MedicalProvider {
+  id            String    @id @default(cuid())
+  documentId    String    @map("document_id")
+  providerName  String    @map("provider_name")
+  amount        Decimal?  @db.Decimal(10, 2)
+  chronology    String?   @db.Text
+  summary       String?   @db.Text
+  isSelected    Boolean   @default(false) @map("is_selected")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("medical_providers")
+}
+
+model GenerationHistory {
+  id            String    @id @default(cuid())
+  documentId    String    @map("document_id")
+  sectionType   String    @map("section_type")
+  promptUsed    String    @db.Text @map("prompt_used")
+  modelUsed     String    @map("model_used")
+  responseTime  Int?      @map("response_time") // milliseconds
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("generation_history")
+}
+
+model Transcription {
+  id            String    @id @default(cuid())
+  documentId    String    @map("document_id")
+  filename      String
+  s3Key         String    @map("s3_key")
+  transcript    String    @db.Text
+  duration      Int?      // seconds
+  wordCount     Int       @default(0) @map("word_count")
+  status        String    @default("processing") // processing, completed, failed
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("transcriptions")
+}
+
+// Document version snapshots
+model DocumentVersion {
+  id            String   @id @default(cuid())
+  documentId    String   @map("document_id")
+  versionNumber Int      @map("version_number")
+  userId        String   @map("user_id")
+  snapshot      Json     // Full document state: { sections: [...], metadata: {...} }
+  changeType    String   @map("change_type") // create, update, delete, restore
+  changeSummary String?  @db.Text @map("change_summary") // "Updated introduction section"
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  document      Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([documentId, versionNumber])
+  @@map("document_versions")
+  @@index([documentId, createdAt])
+}
+
+// Section-level version history (for granular undo/redo)
+model SectionVersion {
+  id            String   @id @default(cuid())
+  sectionId     String   @map("section_id")
+  versionNumber Int      @map("version_number")
+  userId        String   @map("user_id")
+  content       String   @db.Text
+  changeType    String   @map("change_type") // create, update, delete
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  section       DocumentSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([sectionId, versionNumber])
+  @@map("section_versions")
+  @@index([sectionId, createdAt])
+}
+
+// Document analysis for extracting key points
+model DocumentAnalysis {
+  id              String    @id @default(cuid())
+  documentId      String?   @map("document_id")
+  sourceDocumentId String   @map("source_document_id")
+  userId          String    @map("user_id")
+  analysisData    Json      @map("analysis_data") // { legalPoints: [], facts: [], damages: [], summary: string }
+  status          String    @default("processing") // processing, completed, failed
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  document        Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  sourceDocument  SourceDocument @relation(fields: [sourceDocumentId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pointUsages     AnalysisPointUsage[]
+  
+  @@map("document_analyses")
+  @@index([sourceDocumentId])
+  @@index([documentId])
+}
+
+// Track which analysis points are used in which sections
+model AnalysisPointUsage {
+  id            String    @id @default(cuid())
+  analysisId    String    @map("analysis_id")
+  sectionId     String    @map("section_id")
+  pointId       String    @map("point_id") // Identifier from analysis data
+  pointType     String    @map("point_type") // legal, fact, damage
+  pointText     String    @db.Text @map("point_text")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  analysis      DocumentAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  section       DocumentSection  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  
+  @@map("analysis_point_usages")
+  @@index([analysisId])
+  @@index([sectionId])
+}
+
