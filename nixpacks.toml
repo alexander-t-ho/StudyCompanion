@@ -1,9 +1,11 @@
 # Nixpacks configuration for Rails app in backend subdirectory
 # Let Nixpacks auto-detect Ruby version from Gemfile
-[phases.install]
-cmds = ["cd backend && bundle install"]
 
-# Don't run migrations during build - they'll run in release phase
+[phases.install]
+cmds = ["cd backend && bundle install --deployment --without development test"]
+
+# Build phase - explicitly do NOT run migrations here
+# Migrations will run in the release phase via Procfile or releaseCommand
 [phases.build]
 cmds = []
 
